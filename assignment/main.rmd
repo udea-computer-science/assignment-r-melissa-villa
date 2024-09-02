@@ -1,0 +1,198 @@
+##### Tarea R:
+
+#### Series:
+
+### Serie 1:
+
+# Definimos la serie 1:
+serie_1 <- function(n) { 
+  x <- 0
+  for (i in 1:(n-1)) { # Esto representa mi sumatoria, con i=1 hasta "infinito" (n)
+    x <- x + (((-1)^i) * tanh(i)) # Acá estoy definiendo la serie que queremos analizar
+  }
+  return(x)
+}
+
+# Evaluamos la serie que definí, para n=10
+serie_1(10) # -0.7932121
+
+# Hacemos un ciclo para que evalúe la función en todos los números:
+x <- 1:49
+y <- sapply(x, serie_1) # Evaluamos la serie con un ciclo
+
+# Graficamos la serie
+plot(x, y, type = "l", col = "blue", lwd = 2, main = "Serie 1", xlab = "n", ylab = "Valor de la serie")
+# En la gráfica podemos observar que la serie no converge, pues es periódica
+
+### Serie 2:
+
+# Definimos la serie 2:
+serie_2 <- function(n) { 
+  x <- 0
+  for (i in 1:(n-1)) { # Esto representa mi sumatoria, con i=1 hasta "infinito" (n)
+    x <- x + ((atan(i))^2)/((i^2) + 1) # Acá estoy definiendo la serie que queremos analizar
+  }
+  return(x)
+}
+
+# Evaluamos la serie para diferentes valores:
+serie_2(40) # 1.2182
+serie_2(100) # 1.2550
+serie_2(1000) # 1.2772
+serie_2(2000) # 1.2784
+serie_2(3000) # 1.2788
+serie_2(50000000) # 1.2796
+
+# Hacemos un ciclo para que evalúe la función en todos los números:
+x <- 1:999
+y <- sapply(x, serie_2) # Evaluamos la serie con un ciclo
+
+# Graficamos la serie
+plot(x, y, type = "l", col = "blue", lwd = 2, main = "Serie 2", xlab = "n", ylab = "Valor de la serie")
+# En la gráfica podemos observar que la serie converge a 1.2796
+
+### Serie 3:
+
+# Definimos la serie 3:
+serie_3 <- function(n) { 
+  x <- 0
+  for (i in 2:(n-1)) { # Esto representa mi sumatoria, con i=2 hasta "infinito" (n)
+    x <- x + (log(factorial(i), i) / (i^3)) # Acá estoy definiendo la serie que queremos analizar
+  }
+  return(x)
+}
+
+# Evaluamos la serie para diferentes valores:
+serie_3(20) # 0.3291937
+serie_3(40) # 0.3479932
+serie_3(60) # 0.3544322
+serie_3(100) # 0.3596878
+
+# Hacemos un ciclo para que evalúe la función en todos los números:
+x <- 2:99
+y <- sapply(x, serie_3) # Evaluamos la serie con un ciclo
+
+# Graficamos la serie
+plot(x, y, type = "l", col = "blue", lwd = 2, main = "Serie 3", xlab = "n", ylab = "Valor de la serie")
+ # En la gráfica podemos observar que la serie converge a 0.367
+
+### Serie 4:
+
+# Cargamos la librería necesaria
+library(ggplot2)
+
+# Definimos la serie de Taylor para el seno:
+taylor_sin <- function(x, terms = 10) {
+  acumulado <- 0
+  for (n in 0:(terms-1)) {
+    acumulado <- acumulado + ((-1)^n * x^(2*n + 1)) / factorial(2*n + 1)
+  }
+  return(acumulado)
+}
+
+# Evaluamos la serie definida y la función seno para los mismos valores y observamos que arrojan el mismo resultado:
+# 30 grados:
+a <- taylor_sin(pi/6) # 0.49999999999999994
+b <- sin(pi/6) # 0.49999999999999994
+dif <- a - b
+print(dif) # 0.0 -> Ambas funciones arrojan el mismo resultado.
+
+# 45 grados:
+c <- taylor_sin(pi/4) # 0.7071067811865475
+d <- sin(pi/4) # 0.7071067811865475
+dif1 <- c - d
+print(dif1) # 0.0 -> Ambas funciones arrojan el mismo resultado.
+
+# 60 grados:
+e <- taylor_sin(pi/3) # 0.8660254037844385
+f <- sin(pi/3) # 0.8660254037844386
+dif2 <- e - f
+print(dif2) # 0.0 -> Ambas funciones arrojan el mismo resultado.
+
+# 90 grados:
+g <- taylor_sin(pi/2) # 1.0
+h <- sin(pi/2) # 1.0
+dif3 <- g - h
+print(dif3) # 0.0 -> Ambas funciones arrojan el mismo resultado.
+
+# Función para comparar sin(x) y la serie de Taylor:
+comparar_sin <- function(x_values, terms = 10) {
+  cat(sprintf("%12s | %15s | %17s | %12s\n", "x (radianes)", "sin(x) exacto", "Serie de Taylor", "Diferencia"))
+  cat(rep("-", 60), "\n", sep = "")
+  for (x in x_values) {
+    exacto <- sin(x)
+    aproximacion <- taylor_sin(x, terms)
+    diferencia <- abs(exacto - aproximacion)
+    cat(sprintf("%12.6f | %15.10f | %17.10f | %12.10f\n", x, exacto, aproximacion, diferencia))
+  }
+}
+
+# Valores de x para evaluar (en radianes):
+valores_x <- c(
+  0,
+  pi / 6, # 30 grados
+  pi / 4, # 45 grados
+  pi / 3, # 60 grados
+  pi / 2, # 90 grados
+  pi # 180 grados
+)
+
+# Comparación numérica de ambas funciones:
+comparar_sin(valores_x, terms = 10)
+
+# Definimos valores para cada función para realizar la demostración gráfica:
+x_values <- seq(-2*pi, 2*pi, length.out = 100)
+sin_values <- sin(x_values)
+taylor_values <- sapply(x_values, taylor_sin)
+
+# Demostramos gráficamente que ambas funciones son equivalentes:
+data <- data.frame(
+  x = x_values,
+  sin_values = sin_values,
+  taylor_values = taylor_values
+)
+
+ggplot(data, aes(x = x)) +
+  geom_line(aes(y = sin_values, color = 'sin(x)')) +
+  geom_line(aes(y = taylor_values, color = 'sin(x) - Serie de Taylor'), linetype = 'dashed') +
+  labs(title = 'Comparación entre Sin(x) y su Serie de Taylor', x = 'x', y = 'y') +
+  scale_color_manual(name = 'Leyenda', values = c('blue', 'red')) +
+  theme_minimal() +
+  theme(legend.position = 'bottom')
+
+#### Manipulación de datos:
+
+### Punto 1:
+
+data_frame <- read.csv("/workspaces/assignment-r-melissa-villa/assignment/data.csv", sep = "\t", header = FALSE)
+data_frame
+suma_columna2 <- sum(data_frame[, 2], na.rm = TRUE)
+cat("La suma de la segunda columna es:", suma_columna2, "\n")
+
+# Cargar la librería dplyr
+install.packages("dplyr")
+library(dplyr)
+
+# Contar la cantidad de registros por letra en la primera columna
+conteo_letras <- data_frame %>%
+  count(V1) %>%
+  arrange(V1)
+
+# Imprimir resultados de forma vertical
+cat("Cantidad de registros por letra, ordenados alfabéticamente:\n")
+print(conteo_letras)
+
+### Punto 2:
+
+# Agrupar por la primera columna y sumar los valores de la segunda columna
+suma_por_letra <- data_frame %>%
+  group_by(V1) %>%
+  summarise(Suma = sum(V2, na.rm = TRUE))
+
+# Ordenar alfabéticamente por la primera columna (las letras)
+suma_por_letra_ordenada <- suma_por_letra %>%
+  arrange(V1)
+
+# Imprimir resultados
+cat("Suma de la columna 2 por cada letra de la primera columna, ordenados alfabéticamente:\n")
+print(suma_por_letra_ordenada)
